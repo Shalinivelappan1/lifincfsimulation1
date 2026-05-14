@@ -99,7 +99,7 @@ def random_market_shock():
 # TITLE
 # --------------------------------------------------
 
-st.title("Corporate Finance Simulation")
+st.title("Corporate Finance Learning Lab")
 
 st.markdown("""
 This simulation allows students to manage a company through multiple rounds of:
@@ -160,6 +160,19 @@ investment_tab, financing_tab, working_capital_tab, results_tab = st.tabs(
 
 with investment_tab:
 
+    st.subheader("Concept Learning: Capital Budgeting")
+
+    st.latex(r'''NPV = \sum_{t=1}^{n}\frac{CF_t}{(1+r)^t} - C_0''')
+
+    with st.expander("Learn About NPV"):
+        st.write(
+            "Net Present Value (NPV) measures the value created by an investment project after considering the time value of money. Positive NPV indicates value creation for shareholders."
+        )
+
+        st.write(
+            "Higher discount rates reduce project attractiveness because future cash flows become less valuable in present terms."
+        )
+
     st.subheader("Investment Decisions")
 
     project = st.selectbox(
@@ -212,7 +225,27 @@ with investment_tab:
 
 with financing_tab:
 
+    st.subheader("Concept Learning: Capital Structure")
+
+    st.latex(r'''WACC = \frac{E}{V}R_e + \frac{D}{V}R_d(1-T)''')
+
+    with st.expander("Learn About WACC"):
+        st.write(
+            "Weighted Average Cost of Capital (WACC) represents the firm's average financing cost from debt and equity sources."
+        )
+
+        st.write(
+            "Increasing debt initially reduces WACC because of the tax shield benefit. However, excessive leverage increases financial distress risk and may increase WACC later."
+        )
+
     st.subheader("Financing Decisions")
+
+    st.subheader("Financing Decisions")
+
+    capital_structure_strategy = st.selectbox(
+        "Capital Structure Strategy",
+        ["Conservative", "Balanced", "Aggressive"]
+    )
 
     debt_financing = st.slider(
         "New Debt Raised (₹ Cr)",
@@ -244,13 +277,99 @@ with financing_tab:
         macro["Interest Rate"],
     )
 
-    st.metric("Projected WACC", f"{round(projected_wacc*100,2)}%")
+    # Capital Structure Metrics
+
+    de_ratio = projected_debt / projected_equity
+
+    if de_ratio < 0.5:
+        credit_rating = "AAA"
+        bankruptcy_risk = 5
+
+    elif de_ratio < 1.0:
+        credit_rating = "A"
+        bankruptcy_risk = 15
+
+    elif de_ratio < 1.5:
+        credit_rating = "BBB"
+        bankruptcy_risk = 35
+
+    else:
+        credit_rating = "Junk"
+        bankruptcy_risk = 60
+
+    financing_col1, financing_col2 = st.columns(2)
+
+    financing_col1.metric(
+        "Projected WACC",
+        f"{round(projected_wacc*100,2)}%"
+    )
+
+    financing_col2.metric(
+        "Debt-to-Equity Ratio",
+        round(de_ratio,2)
+    )
+
+    st.metric("Credit Rating", credit_rating)
+
+    st.metric(
+        "Bankruptcy Risk",
+        f"{bankruptcy_risk}%"
+    )
+
+    # Dividend Policy
+
+    st.subheader("Dividend Policy")
+
+    dividend_policy = st.selectbox(
+        "Dividend Policy",
+        [
+            "Stable Dividend",
+            "Residual Dividend",
+            "High Dividend",
+            "No Dividend",
+            "Share Buyback"
+        ]
+    )
+
+    investor_sentiment = 0
+
+    if dividend_policy == "Stable Dividend":
+        investor_sentiment += 5
+
+    elif dividend_policy == "High Dividend":
+        investor_sentiment += 8
+
+    elif dividend_policy == "No Dividend":
+        investor_sentiment -= 5
+
+    elif dividend_policy == "Share Buyback":
+        investor_sentiment += 10
+
+    st.metric(
+        "Investor Sentiment Score",
+        investor_sentiment
+    )
 
 # --------------------------------------------------
 # WORKING CAPITAL TAB
 # --------------------------------------------------
 
 with working_capital_tab:
+
+    st.subheader("Concept Learning: Working Capital Management")
+
+    st.latex(r'''CCC = DIO + DSO - DPO''')
+
+    with st.expander("Learn About Cash Conversion Cycle"):
+        st.write(
+            "Cash Conversion Cycle (CCC) measures the time required to convert inventory purchases into cash collected from customers."
+        )
+
+        st.write(
+            "Lower CCC generally improves liquidity efficiency, but excessively aggressive working capital policies may create operational risk."
+        )
+
+    st.subheader("Working Capital Management")
 
     st.subheader("Working Capital Management")
 
